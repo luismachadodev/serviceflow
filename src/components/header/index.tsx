@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { FiUser, FiLogOut, FiLoader, FiLock } from "react-icons/fi"
+import { FiUser, FiLogOut, FiLoader, FiLock, FiMenu } from "react-icons/fi"
 import { signIn, signOut, useSession } from "next-auth/react"
 
 export function Header() {
@@ -39,7 +39,7 @@ export function Header() {
         {status === "authenticated" && (
           <div className="flex items-baseline gap-4">
             <Link href="/dashboard">
-              <FiUser size={26} color="#4b5563" />
+              <FiMenu size={26} color="#4b5563" />
             </Link>
             <button onClick={handleLogout}>
               <FiLogOut size={26} color="#ff2913" />
