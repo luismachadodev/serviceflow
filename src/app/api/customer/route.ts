@@ -19,6 +19,16 @@ export async function DELETE (request: Request) {
     return NextResponse.json({ error: "User id is required" }, { status: 400 });
   }
 
+  const findTickets = await prismaClient.ticket.findFirst({
+    where: {
+      customerId: userId as string
+    }
+  })
+
+  if (findTickets) {
+    return NextResponse.json({ error: "This customer has tickets" }, { status: 400 });
+  }
+
   try {
     await prismaClient.customer.delete({
       where: {
