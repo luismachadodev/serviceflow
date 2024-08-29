@@ -1,15 +1,15 @@
-import { Container } from "@/components/container"
-import { TicketItem } from "@/app/dashboard/components/ticket"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { redirect } from "next/navigation"
-import Link from "next/link"
+import { Container } from "@/components/container";
+import { TicketItem } from "@/app/dashboard/components/ticket";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function Dashboard() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
-  if(!session || !session.user) {
-    redirect("/")
+  if (!session || !session.user) {
+    redirect("/");
   }
 
   return (
@@ -17,7 +17,10 @@ export default async function Dashboard() {
       <main className="mt-9 mb-2">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Chamados</h1>
-          <Link href="/dashboard/new" className="bg-blue-500 px-4 py-1 rounded text-white">
+          <Link
+            href="/dashboard/new"
+            className="bg-blue-500 px-4 py-1 rounded text-white"
+          >
             Abrir chamado
           </Link>
         </div>
@@ -26,7 +29,9 @@ export default async function Dashboard() {
           <thead>
             <tr>
               <th className="font-medium text-left pl-1">CLIENTE</th>
-              <th className="font-medium text-left hidden sm:block">DATA CADASTRO</th>
+              <th className="font-medium text-left hidden sm:block">
+                DATA CADASTRO
+              </th>
               <th className="font-medium text-left">STATUS</th>
               <th className="font-medium text-left">#</th>
             </tr>
@@ -37,5 +42,5 @@ export default async function Dashboard() {
         </table>
       </main>
     </Container>
-  )
+  );
 }
