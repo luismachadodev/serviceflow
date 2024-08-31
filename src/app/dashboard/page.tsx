@@ -22,6 +22,9 @@ export default async function Dashboard() {
     include: {
       customer: true,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   })
 
   return (
