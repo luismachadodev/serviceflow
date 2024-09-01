@@ -34,6 +34,9 @@ export function FormTicket({ customer }: FormTicketProps) {
       description: data.description,
       customerId: customer.id,
     })
+
+    setValue("name", "")
+    setValue("description", "")
   }
 
   return (
