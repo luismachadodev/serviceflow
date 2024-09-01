@@ -1,55 +1,87 @@
+import { NextResponse } from "next/server"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import prismaClient from "@/lib/prisma"
 
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prismaClient from "@/lib/prisma";
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const customerEmail = searchParams.get("email")
 
-export async function DELETE (request: Request) {
-
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!customerEmail || customerEmail === "") {
+    return NextResponse.json({ error: "Customer not found" }, { status: 400 })
   }
 
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("id");
+  try {
+    const customer = await prismaClient.customer.findFirst({
+      where: {
+        email: customerEmail,
+      },
+    })
+
+    return NextResponse.json(customer)
+  } catch (err) {
+    return NextResponse.json({ error: "Customer not found" }, { status: 400 })
+  }
+
+  return NextResponse.json({ message: "RECEBIDO" })
+}
+
+export async function DELETE(request: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 401 })
+  }
+
+  const { searchParams } = new URL(request.url)
+  const userId = searchParams.get("id")
 
   if (!userId) {
-    return NextResponse.json({ error: "User id is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Failed delete customer" },
+      { status: 400 }
+    )
   }
 
   const findTickets = await prismaClient.ticket.findFirst({
     where: {
-      customerId: userId as string
-    }
+      customerId: userId,
+    },
   })
 
   if (findTickets) {
-    return NextResponse.json({ error: "This customer has tickets" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Failed delete customer" },
+      { status: 400 }
+    )
   }
 
   try {
     await prismaClient.customer.delete({
       where: {
-        id: userId as string
-      }
+        id: userId as string,
+      },
     })
-    return NextResponse.json({ message: "Customer deleted successfully" });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed delete customer" }, { status: 400 });
-  }
 
+    return NextResponse.json({ message: "Cliente deletado com sucesso!" })
+  } catch (err) {
+    console.log(err)
+    return NextResponse.json(
+      { error: "Failed delete customer" },
+      { status: 400 }
+    )
+  }
 }
 
-export async function POST (request: Request) {
-  const session = await getServerSession(authOptions);
+// Rota para cadastrar um cliente
+export async function POST(request: Request) {
+  const session = await getServerSession(authOptions)
 
   if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Not authorized" }, { status: 401 })
   }
 
-  const { name, email, phone, address, userId } = await request.json();
+  const { name, email, phone, address, userId } = await request.json()
 
   try {
     await prismaClient.customer.create({
@@ -58,12 +90,15 @@ export async function POST (request: Request) {
         phone,
         email,
         address: address ? address : "",
-        userId: userId
-      }
+        userId: userId,
+      },
     })
 
-    return NextResponse.json({ message: "Customer created successfully" });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed create new customer" }, { status: 400 });
+    return NextResponse.json({ message: "Cliente cadastrado com sucesso!" })
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Failed crete new customer" },
+      { status: 400 }
+    )
   }
 }
